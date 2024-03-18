@@ -40,7 +40,7 @@ def expand_path(path):
         return expand_paths(results)
 
 
-magick_check = re.compile(r'(?<!\\)[*?[{}]')
+magick_check = re.compile('[*?[{}]')
 
 
 def has_magic(s):
