@@ -46,6 +46,16 @@ Documentation
 More information and documentation can be found at
 https://snakebite.readthedocs.io/en/latest/
 
+
+Manual Build
+============
+
+```
+python3 setup.py install
+wheel convert dist/snakebite-xxx.egg
+```
+
+
 Development
 ===========
 
