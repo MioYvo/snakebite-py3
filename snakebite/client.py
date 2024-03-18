@@ -90,7 +90,8 @@ class Client(object):
 
     def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION,
                  use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
-                 sock_connect_timeout=10000, sock_request_timeout=10000, use_datanode_hostname=False):
+                 sock_connect_timeout=10000, sock_request_timeout=10000, use_datanode_hostname=False,
+                 glob_paths=True):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -112,6 +113,8 @@ class Client(object):
         :type sock_request_timeout: int
         :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
         :type use_datanode_hostname: boolean
+        :param glob_paths: parse argument paths as glob pattern
+        :type glob_paths: boolean
         '''
         if hadoop_version < 9:
             raise FatalException("Only protocol versions >= 9 supported")
@@ -128,6 +131,7 @@ class Client(object):
         self.trash = self._join_user_path(".Trash")
         self._server_defaults = None
         self.use_datanode_hostname = use_datanode_hostname
+        self.glob_paths = glob_paths
 
         log.debug("Created client for %s:%s with trash=%s and sasl=%s" % (host, port, use_trash, use_sasl))
 
@@ -1238,7 +1242,7 @@ class Client(object):
 
             log.debug("Trying to find path %s" % path)
 
-            if glob.has_magic(path):
+            if self.glob_paths and glob.has_magic(path):
                 log.debug("Dealing with globs in %s" % path)
                 for item in self._glob_find(path, processor, include_toplevel):
                     yield item
