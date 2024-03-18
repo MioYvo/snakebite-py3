@@ -13,18 +13,12 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-# python 3 support
-from __future__ import absolute_import, print_function, division
-
 import argparse
 import errno
 import sys
 import os
 import json
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from snakebite.client import HAClient
 from snakebite.errors import FileNotFoundException
@@ -41,7 +35,6 @@ from snakebite.config import HDFSConfig
 from snakebite.version import version
 from snakebite.namenode import Namenode
 from snakebite.platformutils import get_current_username
-from snakebite.compat import py_2
 
 
 try:

@@ -19,7 +19,7 @@ from __future__ import absolute_import, print_function, division
 import os
 
 from snakebite.compat import range
-from test.minicluster_testbase import MiniClusterTestBase
+from minicluster_testbase import MiniClusterTestBase
 
 
 class CatTest(MiniClusterTestBase):

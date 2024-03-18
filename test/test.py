@@ -19,23 +19,23 @@ from __future__ import absolute_import, print_function, division
 import sys
 import os
 import glob
-import unittest2
+import unittest
 
 def suite():
-    suite = unittest2.TestSuite()
+    suite = unittest.TestSuite()
     for filename in glob.glob('test/*_test.py'):
         print(filename)
         f = os.path.splitext(os.path.basename(filename))[0]
         module = __import__(f)
-        suite.addTest(unittest2.defaultTestLoader.loadTestsFromModule(module))
+        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(module))
     return suite
 
 
-class run(unittest2.TestProgram):
+class run(unittest.TestProgram):
     """Runs tests and counts errors."""
     def __init__(self):
         #sys.path.append(test)
-        unittest2.TestProgram.__init__(self, '__main__', 'suite')
+        unittest.TestProgram.__init__(self, '__main__', 'suite')
 
     def usageExit(self, msg=None):
         if msg:
@@ -45,7 +45,7 @@ class run(unittest2.TestProgram):
 
     def runTests(self):
         if self.testRunner is None:
-            self.testRunner = unittest2.TextTestRunner(verbosity=self.verbosity)
+            self.testRunner = unittest.TextTestRunner(verbosity=self.verbosity)
         result = self.testRunner.run(self.test)
         error_count = len(result.errors) + len(result.failures)
         sys.exit(error_count)

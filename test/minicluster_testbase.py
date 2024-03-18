@@ -1,14 +1,13 @@
 # python 3 support
-from __future__ import absolute_import, print_function, division
-
-import unittest2
 import os
 import time
+from unittest import TestCase
+
 from snakebite.minicluster import MiniCluster
 from snakebite.client import Client
 
 
-class MiniClusterTestBase(unittest2.TestCase):
+class MiniClusterTestBase(TestCase):
 
     cluster = None
 
@@ -67,11 +66,12 @@ class MiniClusterTestBase(unittest2.TestCase):
         self.client = Client(self.cluster.host, self.cluster.port, int(version))
 
 
-class MiniClusterSpecificPortTest(unittest2.TestCase):
+class MiniClusterSpecificPortTest(TestCase):
     def test_explicit_port(self):
         c = MiniCluster(None, nnport=50050)
         self.assertEqual(50050, c.port)
         c.terminate()
+
 
 if __name__ == '__main__':
     try:

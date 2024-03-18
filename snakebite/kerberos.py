@@ -33,9 +33,6 @@ Luca Toscano (toscano.luca@gmail.com)
 
 '''
 
-# python 3 support
-from __future__ import absolute_import, print_function, division
-
 import gssapi
 
 class Kerberos:

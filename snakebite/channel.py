@@ -59,7 +59,7 @@ from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError, TransientException, FatalException
 from snakebite.crc32c import crc
-from snakebite.compat import range, py_2
+from snakebite.compat import range
 from snakebite import logger
 
 import google.protobuf.internal.encoder as encoder
@@ -134,6 +134,7 @@ class RpcBufferedReader(object):
 
     def _buffer_bytes(self, n):
         to_read = n
+        bytes_read = b''
         for _ in range(self.MAX_READ_ATTEMPTS):
             bytes_read = self.socket.recv(to_read)
             self.buffer += bytes_read

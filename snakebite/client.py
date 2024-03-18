@@ -13,9 +13,6 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-# python 3 support
-from __future__ import absolute_import, print_function, division
-
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
 from snakebite.platformutils import get_current_username
@@ -52,7 +49,6 @@ import socket
 import errno
 import time
 import re
-import sys
 import random
 
 
@@ -136,7 +132,7 @@ class Client(object):
         log.debug("Created client for %s:%s with trash=%s and sasl=%s" % (host, port, use_trash, use_sasl))
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
-        ''' Issues 'ls' command and returns a list of maps that contain fileinfo
+        """ Issues 'ls' command and returns a list of maps that contain fileinfo
 
         :param paths: Paths to list
         :type paths: list
@@ -164,7 +160,7 @@ class Client(object):
 
         >>> list(client.ls(["/source"], include_toplevel=True, include_children=False))
         [{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0, 'block_replication': 0, 'modification_time': 1367317326628, 'length': 0, 'blocksize': 0, 'owner': u'wouter', 'path': '/source'}]
-        '''
+        """
         if not isinstance(paths, list):
             raise InvalidInputException("Paths should be a list")
 
@@ -210,7 +206,9 @@ class Client(object):
         if not mode:
             raise InvalidInputException("chmod: no mode given")
 
-        processor = lambda path, node, mode=mode: self._handle_chmod(path, node, mode)
+        def processor(path, node, mode_=mode):
+            return self._handle_chmod(path, node, mode_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
             if item:
@@ -242,7 +240,9 @@ class Client(object):
         if not owner:
             raise InvalidInputException("chown: no owner given")
 
-        processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
+        def processor(path, node, owner_=owner):
+            return self._handle_chown(path, node, owner_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
             if item:
@@ -283,7 +283,10 @@ class Client(object):
             raise InvalidInputException("chgrp: no group given")
 
         owner = ":%s" % group
-        processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
+
+        def processor(path, node, owner_=owner):
+            return self._handle_chown(path, node, owner_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
             if item:
@@ -408,7 +411,9 @@ class Client(object):
         if not dst:
             raise InvalidInputException("rename: no destination given")
 
-        processor = lambda path, node, dst=dst: self._handle_rename(path, node, dst)
+        def processor(path, node, dst_=dst):
+            return self._handle_rename(path, node, dst_)
+
         for item in self._find_items(paths, processor, include_toplevel=True):
             if item:
                 yield item
@@ -463,7 +468,9 @@ class Client(object):
         if not isinstance(path, (str, unicode)):
             raise InvalidInputException("rename2: Path should be a string")
 
-        processor = lambda path, node, dst=dst, overwriteDest=overwriteDest: self._handle_rename2(path, node, dst, overwriteDest)
+        def processor(path, node, dst_=dst, overwriteDest_=overwriteDest):
+            return self._handle_rename2(path, node, dst_, overwriteDest_)
+
         for item in self._find_items([path], processor, include_toplevel=True):
             return item
 
@@ -510,7 +517,9 @@ class Client(object):
         if not paths:
             raise InvalidInputException("delete: no path given")
 
-        processor = lambda path, node, recurse=recurse: self._handle_delete(path, node, recurse)
+        def processor(path, node, recurse_=recurse):
+            return self._handle_delete(path, node, recurse_)
+
         for item in self._find_items(paths, processor, include_toplevel=True):
             if item:
                 yield item
@@ -626,7 +635,9 @@ class Client(object):
         if not blocksize:
             blocksize = defaults['blockSize']
 
-        processor = lambda path, node, replication=replication, blocksize=blocksize: self._handle_touchz(path, node, replication, blocksize)
+        def processor(path, node, replication_=replication, blocksize_=blocksize):
+            return self._handle_touchz(path, node, replication_, blocksize_)
+
         for item in self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True, include_children=False):
             if item:
                 yield item
@@ -667,7 +678,9 @@ class Client(object):
         if not replication:
             raise InvalidInputException("setrep: no replication given")
 
-        processor = lambda path, node, replication=replication: self._handle_setrep(path, node, replication)
+        def processor(path, node, replication_=replication):
+            return self._handle_setrep(path, node, replication_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
             if item:
@@ -696,7 +709,9 @@ class Client(object):
         if not paths:
             raise InvalidInputException("cat: no path given")
 
-        processor = lambda path, node, check_crc=check_crc: self._handle_cat(path, node, check_crc)
+        def processor(path, node, check_crc_=check_crc):
+            return self._handle_cat(path, node, check_crc_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=False):
             if item:
@@ -732,7 +747,9 @@ class Client(object):
 
         dst = self._normalize_path(dst)
 
-        processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_copyToLocal(path, node, dst, check_crc)
+        def processor(path, node, dst=dst, check_crc_=check_crc):
+            return self._handle_copyToLocal(path, node, dst, check_crc_)
+
         for path in paths:
             self.base_source = None
             for item in self._find_items([path], processor, include_toplevel=True, recurse=True, include_children=True):
@@ -807,13 +824,15 @@ class Client(object):
         temporary_target = "%s._COPYING_" % dst
         f = open(temporary_target, 'wb')
 
-        processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_getmerge(path, node, dst, check_crc)
+        def processor(path, node, dst=dst, check_crc_=check_crc):
+            return self._handle_getmerge(path, node, dst, check_crc_)
+
         try:
             for item in self._find_items([path], processor, include_toplevel=True, recurse=False, include_children=True):
                 for load in item:
                     if load['result']:
                         f.write(load['response'])
-                    elif not load['error'] is '':
+                    elif load['error'] != '':
                         if os.path.isfile(temporary_target):
                             os.remove(temporary_target)
                         raise FatalException(load['error'])
@@ -942,7 +961,9 @@ class Client(object):
         if not path:
             raise InvalidInputException("test: no path given")
 
-        processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
+        def processor(path, node, exists_=exists, directory_=directory, zero_length_=zero_length):
+            return self._handle_test(path, node, exists_, directory_, zero_length_)
+
         try:
             items = list(self._find_items([path], processor, include_toplevel=True))
             if len(items) == 0:
@@ -972,7 +993,9 @@ class Client(object):
         if not paths:
             raise InvalidInputException("text: no path given")
 
-        processor = lambda path, node, check_crc=check_crc: self._handle_text(path, node, check_crc)
+        def processor(path, node, check_crc_=check_crc):
+            return self._handle_text(path, node, check_crc_)
+
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=False):
             if item:

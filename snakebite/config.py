@@ -1,13 +1,7 @@
-# python 3 support
-from __future__ import absolute_import, print_function, division
-
 import os
 import logging
 import xml.etree.ElementTree as ET
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from snakebite.namenode import Namenode
 
