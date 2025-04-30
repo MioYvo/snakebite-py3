@@ -50,9 +50,18 @@ https://snakebite.readthedocs.io/en/latest/
 Manual Build
 ============
 
+```shell
+protoc -I=protobuf --python_out=snakebite/protobuf protobuf/*.proto
 ```
-python3 setup.py install
-wheel convert dist/snakebite-xxx.egg
+
+```shell
+python3 setup.py build
+python3 setup.py bdist_wheel
+```
+
+test install
+```shell
+pip install dist/snakebite_py3-xxxxx.whl
 ```
 
 
